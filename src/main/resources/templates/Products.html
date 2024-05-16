@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>BuyBay - Products</title>
+    <link href="/ProductStyle.css" rel="stylesheet" type="text/css">
+</head>
+<body onload="setup()">
+<header>
+    <a href="index.html"><img alt="Home" height="50px" src="/photos/homes.png" width="50px"></a>
+</header>
+<div class="container">
+    <div class="title">
+        <br>
+        <br>
+        <h1>Look for items</h1>
+        <input class="search-bar" id="searchInput" onkeydown="if (event.key === 'Enter') { searchProducts(); }"
+               placeholder="Search for products..."
+               type="text">
+        <button onclick="searchProducts()">Search</button>
+    </div>
+    <div class="products" id="productsContainer">
+        <!-- Product items will be displayed here -->
+    </div>
+    <div class="pagination">
+        <button id="prevPage" onclick="prevPage()">Previous</button>
+        <button id="nextPage" onclick="nextPage()">Next</button>
+    </div>
+</div>
+
+<a class="cart" href="/cart.html" id="cartButton">Cart (0)</a>
+<!--<a class="cart" href="/login.html" id="loginButton" th:unless="${signedIn}">Login</a>-->
+
+<script src="/cart.js"></script>
+<script>
+
+    var signedIn = JSON.parse(Get("/amIsignedIn"));
+
+    // Function to initialize cart count
+    function initializeCartCount() {
+        var cartItemCount;
+        if (signedIn)
+            cartItemCount = JSON.parse(Get("/getCart"));
+        else
+            cartItemCount = JSON.parse(localStorage.getItem('cart')) || [];
+        updateCartCount(cartItemCount.length);
+    }
+
+    // Function to display confirmation message
+    function displayConfirmationMessage(productName) {
+        alert("Added to cart: " + productName);
+    }
+
+    // Pagination variables
+    var currentPage = 1;
+    var productsPerPage = 9;
+
+    // Function to display products based on current page
+    function displayProducts(productsToShow) {
+        var productsContainer = document.getElementById('productsContainer');
+        productsContainer.innerHTML = '';
+
+        productsToShow.forEach(function (p) {
+            var productElement = document.createElement('div');
+            productElement.classList.add('product');
+
+            if (signedIn)
+                productElement.innerHTML = "<h2 class='product-name'>" + p.name + "</h2> <img src='/getImage?id=" + p.id + "&number=0' alt='" + p.name + "' onclick='viewProductDetails(" + p.id + ")'><div class='buy-buttons'> <button class='buy-button' onclick='buyNow(" + p.id + ")'>Buy Now</button> <p class='product-price'>$" + p.price + "</p><button class='cart-button' onclick='addToCart(" + p.id + ")'>Add To Cart</button></div>";
+            else
+                productElement.innerHTML = "<h2 class='product-name'>" + p.name + "</h2> <img src='/getImage?id=" + p.id + "&number=0' alt='" + p.name + "' onclick='viewProductDetails(" + p.id + ")'><div class='buy-buttons'> <button class='buy-button' onclick='buyNow(" + p.id + ")'>Buy Now</button> <p class='product-price'>$" + p.price + "</p><button class='cart-button' onclick='addToLocalCart(" + p.id + "); initializeCartCount()'>Add To Cart</button></div>";
+
+            productsContainer.appendChild(productElement);
+        });
+    }
+
+    // Function to navigate to the previous page
+    function prevPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            displayProducts(getProductsOnCurrentPage());
+        }
+    }
+
+    // Function to navigate to the next page
+    function nextPage() {
+        var totalPages = Math.ceil(products.length / productsPerPage);
+        if (currentPage < totalPages) {
+            currentPage++;
+            displayProducts(getProductsOnCurrentPage());
+        }
+    }
+
+    // Function to buy now
+    function buyNow(productId) {
+        var product = products.find(p => p.id === productId);
+        alert("You bought: " + product.name);
+    }
+
+    // Function to add to cart
+    function addToCart(productId) {
+        var cartItems = JSON.parse(Get("/getCart")) || [];
+        var existingItem = cartItems.find(item => item.first.id === productId);
+        if (existingItem) {
+            increaseQuantity(productId);
+        } else {
+            var xhr = new XMLHttpRequest();
+
+            xhr.onload = function () {
+                updateCartCount(cartItems.length + 1);
+            };
+
+            xhr.open("POST", "/addCart", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+            xhr.send("id=" + productId + "&amount=1");
+        }
+        displayConfirmationMessage(productName);
+    }
+
+    // Function to update cart count
+    function updateCartCount(count) {
+        var cartButton = document.getElementById('cartButton');
+        if (cartButton != null)
+            cartButton.innerText = "Cart (" + count + ")";
+    }
+
+    // Function to search products
+    function searchProducts() {
+        var searchInput = document.getElementById('searchInput').value.toLowerCase();
+        displayProducts(JSON.parse(Get("/productsearch?search=" + searchInput + "&number=" + productsPerPage)));
+    }
+
+    // Function to get products on the current page
+    function getProductsOnCurrentPage() {
+        var startIndex = (currentPage - 1) * productsPerPage;
+        var endIndex = startIndex + productsPerPage;
+        return JSON.parse(Get("/productlist?start=" + startIndex + "&end=" + endIndex));
+    }
+
+    function viewProductDetails(productId) {
+        window.location.href = "product.html?id=" + productId;
+    }
+
+    function setup() {
+        // Initialize
+        initializeCartCount();
+        const params = new URLSearchParams(document.location.search);
+        document.getElementById('searchInput').value = params.get("search");
+        if (document.getElementById('searchInput').value != null && document.getElementById('searchInput').value !== "")
+            searchProducts();
+        else
+            displayProducts(getProductsOnCurrentPage());
+    }
+</script>
+</body>
+</html>

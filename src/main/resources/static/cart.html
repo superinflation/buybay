@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>BuyBay - Cart</title>
+    <link href="cartstyle.css" rel="stylesheet" type="text/css">
+</head>
+<body onload="updateCart()">
+<div class="container">
+    <header>
+        <a href="/Products.html"><img alt="Home" height="50px" src="photos/back.png" width="50px"></a>
+    </header>
+
+    <h1>Shopping Cart</h1>
+    <div id="cartItems"></div>
+    <div id="totalPrice"></div>
+</div>
+<input class="btn" onclick="window.location.href='checkout.html';" type="submit" value="Continue to checkout">
+
+<script src="cart.js"></script>
+<script>
+
+    var signedIn = JSON.parse(Get("/amIsignedIn"));
+
+    var cartItems;
+
+    function updateCart() {
+        if (signedIn)
+            cartItems = JSON.parse(Get("/getCart"));
+        else
+            cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+        displayCartItems();
+    }
+
+    // Function to display cart items
+    function displayCartItems() {
+        var cartItemsContainer = document.getElementById('cartItems');
+        var totalPriceContainer = document.getElementById('totalPrice');
+        var totalPrice = 0;
+
+        cartItemsContainer.innerHTML = '';
+        totalPriceContainer.innerHTML = '';
+
+        if (cartItems && cartItems.length > 0) {
+            cartItems.forEach(function (item) {
+                var itemElement = document.createElement('div');
+                itemElement.classList.add('cart-item');
+                if (signedIn) {
+                    itemElement.innerHTML = `
+                    <div class="item-info">
+                        <img src="/getImage?id=${item.first.id}&number=0" alt="${item.first.name}" class="product-image">
+                        <div class="product-details">
+                            <p class="product-name">${item.first.name}</p>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="decreaseQuantity(${item.first.id}); updateCart()">-</button>
+                                <span class="quantity">${item.second}</span>
+                                <button class="quantity-btn" onclick="increaseQuantity(${item.first.id})">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="product-price">$${item.first.price * item.second}</p>
+                    <button class="remove-btn" onclick="removeItem(${item.first.id})">Remove</button>
+                `;
+                    totalPrice += item.first.price * item.second;
+                } else {
+                    var product = JSON.parse(Get("/getProduct?id=" + item.id))
+                    if (product != null) {
+                        itemElement.innerHTML = `
+                        <div class="item-info">
+                            <img src="/getImage?id=${product.id}&number=0" alt="${product.name}" class="product-image">
+                            <div class="product-details">
+                                <p class="product-name">${product.name}</p>
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn" onclick="decreaseLocalQuantity(${product.id}); updateCart()">-</button>
+                                    <span class="quantity">${item.quantity}</span>
+                                    <button class="quantity-btn" onclick="increaseLocalQuantity(${product.id}, ${product.stock}); updateCart()">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="product-price">$${product.price * item.quantity}</p>
+                        <button class="remove-btn" onclick="removeLocalItem(${product.id}); updateCart()">Remove</button>
+                    `;
+                    }
+                    totalPrice += product.price * item.quantity;
+                }
+                cartItemsContainer.appendChild(itemElement);
+            });
+        } else {
+            cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
+        }
+
+        totalPriceContainer.innerHTML = `<p>Total Price: $${totalPrice}</p>`;
+    }
+
+
+</script>
+</body>
+</html>

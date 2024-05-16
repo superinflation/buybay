@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Success</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        header {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            background-color: #ffffff;
+            color: #fff; /* Change the text color to white */
+            padding: 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+
+        body {
+            font-family: Arial;
+            font-size: 17px;
+            padding: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .row {
+            display: -ms-flexbox; /* IE10 */
+            display: flex;
+            -ms-flex-wrap: wrap; /* IE10 */
+            flex-wrap: wrap;
+            margin: 0 -16px;
+        }
+
+        .col-25 {
+            -ms-flex: 25%; /* IE10 */
+            flex: 25%;
+        }
+
+        .col-50 {
+            -ms-flex: 50%; /* IE10 */
+            flex: 50%;
+        }
+
+        .col-75 {
+            -ms-flex: 75%; /* IE10 */
+            flex: 75%;
+        }
+
+        .col-25,
+        .col-50,
+        .col-75 {
+            padding: 0 16px;
+        }
+
+        .container {
+            background-color: #f2f2f2;
+            padding: 5px 20px 15px 20px;
+            border: 1px solid lightgrey;
+            border-radius: 3px;
+        }
+
+        .quantity-btn {
+            width: 25px; /* Adjust the width to your desired size */
+            height: 20px; /* Adjust the height to your desired size */
+        }
+
+        input[type=text] {
+            width: 100%;
+            margin-bottom: 20px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        .h2 {
+            text-align: center;
+            display: flex;
+            align-items: center;
+        }
+
+
+        label {
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .icon-container {
+            margin-bottom: 20px;
+            padding: 7px 0;
+            font-size: 24px;
+        }
+
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border: none;
+            width: 100%;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 17px;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        a {
+            color: #2196F3;
+        }
+
+        hr {
+            border: 1px solid lightgrey;
+        }
+
+        span.price {
+            float: right;
+            color: grey;
+
+        }
+    </style>
+</head>
+<body>
+<div class="tabcontent" id="Cart"></div>
+<div class="row">
+    <div class="col-75">
+        <div class="container">
+            <form action="/checkout" method="post">
+
+                <div class="row">
+                    <div class="col-50">
+                        <h3>Billing Address</h3>
+                        <label for="fname"><i class="fa fa-user"></i> Full Name</label>
+                        <input id="fname" name="firstname" placeholder="Grant W. Garrison" type="text">
+                        <label for="email"><i class="fa fa-envelope"></i> Email</label>
+                        <input id="email" name="email" placeholder="garrigra001@mysbisd.org" type="text">
+                        <label for="adr"><i class="fa fa-address-card-o"></i> Address</label>
+                        <input id="adr" name="address" placeholder="7938 Wellington Ct S" type="text">
+                        <label for="city"><i class="fa fa-institution"></i> City</label>
+                        <input id="city" name="city" placeholder="Houston" type="text">
+
+                        <div class="row">
+                            <div class="col-50">
+                                <label for="state">State</label>
+                                <input id="state" name="state" placeholder="TX" type="text">
+                            </div>
+                            <div class="col-50">
+                                <label for="zip">Zip</label>
+                                <input id="zip" name="zip" placeholder="12345" type="text">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-50">
+                        <h3>Payment</h3>
+                        <label for="fname">Accepted Cards</label>
+                        <div class="icon-container">
+                            <i class="fa fa-cc-visa" style="color:navy;"></i>
+                            <i class="fa fa-cc-amex" style="color:blue;"></i>
+                            <i class="fa fa-cc-mastercard" style="color:red;"></i>
+                            <i class="fa fa-cc-discover" style="color:orange;"></i>
+                        </div>
+                        <label for="cname">Name on Card</label>
+                        <input id="cname" name="cardname" placeholder="Grant Walker Garrison" type="text">
+                        <label for="ccnum">Credit card number</label>
+                        <input id="ccnum" name="cardnumber" placeholder="1111-2222-3333-4444" type="text">
+                        <label for="expmonth">Exp Month</label>
+                        <input id="expmonth" name="expmonth" placeholder="September" type="text">
+                        <div class="row">
+                            <div class="col-50">
+                                <label for="expyear">Exp Year</label>
+                                <input id="expyear" name="expyear" placeholder="2027" type="text">
+                            </div>
+                            <div class="col-50">
+                                <label for="cvv">CVV</label>
+                                <input id="cvv" name="cvv" placeholder="123" type="text">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <label>
+                    <input checked="checked" name="sameadr" type="checkbox"> Shipping address same as billing
+                </label>
+                <input class="btn" type="submit" value="Continue to checkout">
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openPage(pageName, elmnt, color) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablink");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].style.backgroundColor = "";
+            }
+            document.getElementById(pageName).style.display = "block";
+            elmnt.style.backgroundColor = color;
+        }
+
+        // Get the element with id="defaultOpen" and click on it
+        document.getElementById("defaultOpen").click();
+    </script>
+
+</div>
+
+
+<script>
+    function openPage(pageName, elmnt, color) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablink");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].style.backgroundColor = "";
+        }
+        document.getElementById(pageName).style.display = "block";
+        elmnt.style.backgroundColor = color;
+    }
+
+    // Get the element with id="defaultOpen" and click on it
+    document.getElementById("defaultOpen").click();
+</script>
+</body>
+</html>
